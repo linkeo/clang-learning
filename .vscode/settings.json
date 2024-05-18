@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.automaticReconfigure": true,
+  "cmake.configureOnEdit": true,
+  "cSpell.words": ["astar", "debugf"],
+  "files.autoSave": "onFocusChange"
+}
