@@ -25,14 +25,14 @@ char *direction_str(direction_t d) {
 }
 
 inline direction_t direction_reverse(const direction_t direction) {
-  debugf("\t\tdirection_reverse %s to %s\n", direction_str(direction),
-         direction_str(DIRECTION_SOUTH_EAST - direction));
+  // debugf("\t\tdirection_reverse %s to %s\n", direction_str(direction),
+  //        direction_str(DIRECTION_SOUTH_EAST - direction));
   return DIRECTION_SOUTH_EAST - direction;
 }
 
 inline point point_move(const point from, const direction_t direction) {
-  debugf("\tpoint (%zu, %zu) move %s\n", from.row, from.col,
-         direction_str(direction));
+  // debugf("\tpoint (%zu, %zu) move %s\n", from.row, from.col,
+  //        direction_str(direction));
   point to = from;
   to.row += direction / 3 - 1;
   to.col += direction % 3 - 1;

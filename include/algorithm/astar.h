@@ -20,10 +20,14 @@ typedef enum __astar_result {
   ASTAR_FAILED
 } astar_state;
 
+#define ASTAR_STATE_LENGTH 4
+
+char *astar_state_str(astar_state s);
+
 typedef struct __astar_point_state {
-  bool visited : 1;
-  bool calculated : 1;
-  bool used : 1;
+  bool marked : 1;  /// marked to be visit
+  bool visited : 1; /// already visited
+  bool is_path : 1; /// in the result path
   direction_t direction : 4;
   aster_cost_t paid_cost;
   aster_cost_t predict_cost;
@@ -32,6 +36,8 @@ typedef struct __astar_point_state {
 typedef struct __astar_context_struct {
   astar_state state;
   size_t iteration;
+  size_t path_length;
+  aster_cost_t path_cost;
   point start_point;
   point end_point;
   tile_map map;
@@ -46,5 +52,17 @@ void astar_free(astar_context *astar_ptr);
 
 astar_state astar_resolve(astar_context astar);
 void astar_print(const astar_context astar, FILE *f);
+
+typedef enum __astar_point_type {
+  ASTAR_ORIGINAL = 0,
+  ASTAR_START_POINT,
+  ASTAR_END_POINT,
+  ASTAR_PATH,
+  ASTAR_MARKED,
+  ASTAR_VISITED,
+} astar_point_type;
+
+astar_point_type astar_get_point_type(const astar_context astar, size_t row,
+                                      size_t col);
 
 #endif

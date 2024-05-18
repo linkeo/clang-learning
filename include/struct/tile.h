@@ -1,8 +1,14 @@
 #ifndef __STRUCT_TILE_H
 #define __STRUCT_TILE_H
+#include "image/bitmap.h"
 #include "struct/point.h"
 #include <stddef.h>
 #include <stdio.h>
+
+#define BORDER_BLOCK "███"
+#define WALL_BLOCK "▓▓▓"
+#define EMPTY_BLOCK "   "
+#define INVALID_BLOCK "???"
 
 typedef enum __tile_t_enum {
   TILE_EMPTY = 0,
