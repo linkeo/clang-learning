@@ -9,17 +9,15 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAP_ROWS 270
-#define MAP_COLS 480
-
-#define RANDOM_EMPTY 5
-#define RANDOM_TOTAL 10
+size_t MAP_ROWS = 270;
+size_t MAP_COLS = 480;
+double EMPTY_RATIO = 0.54321;
 
 tile_map generate_tile_map(size_t rows, size_t cols) {
   tile_map map = tile_map_new(rows, cols);
   for (size_t r = 0; r < rows; r++) {
     for (size_t c = 0; c < cols; c++) {
-      bool is_empty = (unsigned)random() % RANDOM_TOTAL < RANDOM_EMPTY;
+      bool is_empty = (double)((unsigned)random() % 1000) / 1000 < EMPTY_RATIO;
       tile_t val = tile_from_int(is_empty ? TILE_EMPTY : TILE_WALL);
       tile_map_set(map, r, c, val);
     }
@@ -90,19 +88,24 @@ int main() {
   astar_resolve(astar);
   double time_after_resolve = current_time();
   // astar_print(astar, stdout);
-  printf("astar iteration: %zu, path blocks: %zu\n", astar->iteration,
+  printf("astar iteration: %zu, path length: %zu\n", astar->iteration,
          astar->path_length);
   aster_cost_t estimate_cost = astar_estimate_cost(&start_point, &end_point);
-  printf("estimate cost: %.1f, actual cost: %.1f, inflation: %.1f%%\n",
-         (double)estimate_cost / ASTAR_STANDARD_UNIT,
-         (double)astar->path_cost / ASTAR_STANDARD_UNIT,
+  printf("astar comparison times: %zu, ideal free cost x %.3f\n",
+         astar->comparison_count,
+         (double)astar->comparison_count / (estimate_cost * estimate_cost));
+  printf("estimate cost: %.1f\n", (double)estimate_cost);
+  printf("actual cost: %.1f, extra cost: %.1f%%\n", (double)astar->path_cost,
          ((double)astar->path_cost / estimate_cost - 1) * 100);
+  printf("actual iter: %.1f, iter ratio: %.3f\n", (double)astar->iteration,
+         (double)astar->iteration / estimate_cost);
   double time_cost_resolve = time_after_resolve - time_before_resolve;
   printf("astar resolve time: %.3fms = %.1f times/frame\n", time_cost_resolve,
          50 / time_cost_resolve / 3);
 
   printf("seed: %u\n", seed);
-  printf("map: %u x %u = %u blocks\n", MAP_ROWS, MAP_COLS, MAP_ROWS * MAP_COLS);
+  printf("map: %zu x %zu = %zu blocks\n", MAP_ROWS, MAP_COLS,
+         MAP_ROWS * MAP_COLS);
 
   FILE *result_file = fopen("astar_result.generated.bmp", "wb");
   bitmap_image result_image = astar_draw_image(astar);

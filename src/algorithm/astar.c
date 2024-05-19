@@ -33,6 +33,7 @@ astar_context astar_init(tile_map map, point start, point end) {
   memset(astar->states, 0, state_size);
   astar->state = ASTAR_INIT;
   astar->iteration = 0;
+  astar->comparison_count = 0;
   astar->path_length = 0;
   astar->start_point = start;
   astar->end_point = end;
@@ -40,7 +41,16 @@ astar_context astar_init(tile_map map, point start, point end) {
   astar->queue = (point *)malloc(sizeof(point) * map->rows * map->cols);
   astar->queue_start = astar->queue;
   astar->queue_end = astar->queue;
+  astar->estimate_cost_factor = 1.4142;
   return astar;
+}
+
+bool astar_set_estimate_cost_factor(astar_context astar, double factor) {
+  if (factor > 0 && factor < 10) {
+    astar->estimate_cost_factor = factor;
+    return true;
+  }
+  return false;
 }
 
 void astar_free(astar_context *astar_ptr) {
@@ -187,6 +197,7 @@ inline point *astar_dequeue(astar_context astar) {
 
 aster_cost_t astar_compare_cost(astar_context astar, point *left,
                                 point *right) {
+  astar->comparison_count++;
   astar_point_state *left_state = astar_point_ptr(astar, left);
   astar_point_state *right_state = astar_point_ptr(astar, right);
   if (left_state->predict_cost != right_state->predict_cost) {
@@ -255,8 +266,9 @@ void aster_calculate_point(astar_context astar, point *pt) {
     }
   }
   pt_state->predict_cost =
-      pt_state->paid_cost + astar_estimate_cost(pt, &astar->end_point) *
-                                ASTAR_DIAGONAL_COST / ASTAR_PARALLEL_COST;
+      pt_state->paid_cost +
+      (aster_cost_t)(astar_estimate_cost(pt, &astar->end_point) *
+                     astar->estimate_cost_factor);
   pt_state->marked = true;
   debugf(
       "astar calculate point %s (%zu, %zu) paid cost: %ld, predict cost: %ld\n",
